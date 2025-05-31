@@ -150,6 +150,30 @@ export function SettingsClient() {
     }
   };
 
+  const handleMockData = async () => {
+    setTesting(true);
+    try {
+      const response = await fetch("/api/scraping/mock", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(
+          `モックデータでポートフォリオを更新しました！${data.count}件の保有株式を追加`
+        );
+      } else {
+        const error = await response.json();
+        alert(`モックデータ更新に失敗しました: ${error.error}`);
+      }
+    } catch (error) {
+      console.error("Failed to update mock data:", error);
+      alert("モックデータ更新に失敗しました");
+    } finally {
+      setTesting(false);
+    }
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -308,6 +332,18 @@ export function SettingsClient() {
                 />
                 {testing ? "データ取得中..." : "ポートフォリオデータを取得"}
               </Button>
+
+              <Button
+                onClick={handleMockData}
+                disabled={testing}
+                variant="secondary"
+                className="flex items-center gap-2"
+              >
+                <Download
+                  className={`h-4 w-4 ${testing ? "animate-spin" : ""}`}
+                />
+                {testing ? "モック更新中..." : "モックデータでテスト"}
+              </Button>
             </div>
 
             <div className="text-sm text-gray-600 mt-4">
@@ -317,6 +353,10 @@ export function SettingsClient() {
               <p>
                 • データ取得:
                 実際に保有株式のデータを取得してデータベースを更新します
+              </p>
+              <p>
+                • モックデータ:
+                テスト用のサンプルデータでポートフォリオ機能を確認します
               </p>
             </div>
           </CardContent>

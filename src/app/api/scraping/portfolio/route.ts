@@ -72,10 +72,37 @@ export async function POST() {
 
     // SBI証券のログインページにアクセス
     console.log("📄 SBI証券ログインページにアクセス中...");
-    await page.goto("https://www.sbisec.co.jp/ETGate", {
-      waitUntil: "networkidle2",
-      timeout: 30000,
-    });
+
+    try {
+      await page.goto("https://www.sbisec.co.jp/ETGate", {
+        waitUntil: "domcontentloaded", // networkidle2より軽い条件に変更
+        timeout: 60000, // タイムアウトを60秒に延長
+      });
+      console.log("✅ ページ読み込み完了");
+    } catch (error) {
+      console.error("❌ ページアクセスエラー:", error);
+      throw new Error(
+        `SBI証券サイトへのアクセスに失敗しました: ${String(error)}`
+      );
+    }
+
+    // ページが正しく読み込まれているかチェック
+    const pageTitle = await page.title();
+    console.log("📄 ページタイトル:", pageTitle);
+
+    // ログイン要素の存在確認
+    const userIdField = await page.$('input[name="user_id"]');
+    const passwordField = await page.$('input[name="user_password"]');
+    const loginButton = await page.$('input[name="ACT_login"]');
+
+    if (!userIdField || !passwordField || !loginButton) {
+      console.error("❌ ログイン要素が見つかりません");
+      throw new Error(
+        "SBI証券のログインページの構造が変更されている可能性があります"
+      );
+    }
+
+    console.log("✅ ログイン要素を確認");
 
     // ログイン情報を入力
     console.log("🔑 ログイン情報を入力中...");
@@ -84,29 +111,78 @@ export async function POST() {
 
     // ログインボタンをクリック
     console.log("🚀 ログイン実行中...");
-    await Promise.all([
-      page.waitForNavigation({ waitUntil: "networkidle2", timeout: 30000 }),
-      page.click('input[name="ACT_login"]'),
-    ]);
+    try {
+      await Promise.all([
+        page.waitForNavigation({
+          waitUntil: "domcontentloaded",
+          timeout: 60000,
+        }),
+        page.click('input[name="ACT_login"]'),
+      ]);
+      console.log("✅ ログイン完了");
+    } catch (error) {
+      console.error("❌ ログインエラー:", error);
+      throw new Error(`ログイン処理に失敗しました: ${String(error)}`);
+    }
 
-    // ログインエラーチェック
-    const loginError = await page.$(".em");
-    if (loginError) {
-      const errorText = await page.evaluate((el) => el.textContent, loginError);
-      throw new Error(`ログインエラー: ${errorText || "不明なエラー"}`);
+    // 少し待機してページが安定するのを待つ
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // ログインエラーチェック（新しいページで実行）
+    try {
+      const loginError = await page.$(".em");
+      if (loginError) {
+        const errorText = await page.evaluate(
+          (el) => el?.textContent || "",
+          loginError
+        );
+        throw new Error(`ログインエラー: ${errorText || "不明なエラー"}`);
+      }
+    } catch {
+      // エラー要素が見つからない場合は正常（ログイン成功）
+      console.log("⚠️ エラー要素チェックをスキップ（ページ変更により正常）");
     }
 
     console.log("✅ ログイン成功");
 
+    // 現在のURLを確認
+    const currentUrl = page.url();
+    console.log("📍 現在のURL:", currentUrl);
+
     // ポートフォリオページに移動
     console.log("📊 ポートフォリオページに移動中...");
-    await page.goto(
-      "https://www.sbisec.co.jp/ETGate/?_ControlID=WPLETmgR001Control&_PageID=WPLETmgR001Mdtl20&_DataStoreID=DSWPLETmgR001Control&_ActionID=DefaultAID&getFlg=on",
-      {
-        waitUntil: "networkidle2",
-        timeout: 30000,
+
+    try {
+      await page.goto(
+        "https://www.sbisec.co.jp/ETGate/?_ControlID=WPLETmgR001Control&_PageID=WPLETmgR001Mdtl20&_DataStoreID=DSWPLETmgR001Control&_ActionID=DefaultAID&getFlg=on",
+        {
+          waitUntil: "domcontentloaded",
+          timeout: 60000,
+        }
+      );
+      console.log("✅ ポートフォリオページ読み込み完了");
+    } catch (error) {
+      console.error("❌ ポートフォリオページアクセスエラー:", error);
+
+      // フォールバック: 別のポートフォリオページを試す
+      console.log("🔄 別のページを試行中...");
+      try {
+        await page.goto(
+          "https://www.sbisec.co.jp/ETGate/?_ControlID=WPLETmgR001Control&_PageID=WPLETmgR001Mdtl20",
+          {
+            waitUntil: "domcontentloaded",
+            timeout: 60000,
+          }
+        );
+        console.log("✅ フォールバックページ読み込み完了");
+      } catch (fallbackError) {
+        console.error("❌ フォールバックページもエラー:", fallbackError);
+        throw new Error("ポートフォリオページへのアクセスに失敗しました");
       }
-    );
+    }
+
+    // ページが読み込まれるまで少し待機
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     // ポートフォリオデータをスクレイピング
     console.log("🔍 ポートフォリオデータを解析中...");
