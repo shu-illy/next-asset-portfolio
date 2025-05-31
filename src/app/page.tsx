@@ -1,102 +1,190 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import Navbar from "@/components/layout/navbar";
+import { Button } from "@/components/ui/button";
+import { signIn } from "next-auth/react";
+import {
+  BarChart3,
+  TrendingUp,
+  Wallet,
+  Shield,
+  Smartphone,
+  Globe,
+} from "lucide-react";
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+export default function HomePage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (session) {
+      router.push("/dashboard");
+    }
+  }, [session, router]);
+
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="flex items-center justify-center h-96">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600" />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      </div>
+    );
+  }
+
+  if (session) {
+    return null; // リダイレクト中
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+
+      {/* ヒーローセクション */}
+      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+              配当金管理を
+              <br />
+              もっとスマートに
+            </h1>
+            <p className="text-xl md:text-2xl mb-8 text-blue-100">
+              株式投資の配当金を効率的に追跡・分析し、
+              <br />
+              投資戦略の最適化をサポートします
+            </p>
+            <Button
+              size="lg"
+              onClick={() => signIn("google")}
+              className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-8 py-3"
+            >
+              無料で始める
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* 機能紹介セクション */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              主な機能
+            </h2>
+            <p className="text-xl text-gray-600">
+              投資家のための包括的な配当金管理ツール
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center p-6">
+              <div className="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <BarChart3 className="h-8 w-8 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">リアルタイム分析</h3>
+              <p className="text-gray-600">
+                保有株式の配当利回りや収益性を リアルタイムで分析・可視化
+              </p>
+            </div>
+
+            <div className="text-center p-6">
+              <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <TrendingUp className="h-8 w-8 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">配当予測</h3>
+              <p className="text-gray-600">
+                過去のデータを基に将来の 配当収入を予測・計画
+              </p>
+            </div>
+
+            <div className="text-center p-6">
+              <div className="bg-purple-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Wallet className="h-8 w-8 text-purple-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">ポートフォリオ管理</h3>
+              <p className="text-gray-600">
+                保有株式の一元管理と セクター分散の最適化
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 特徴セクション */}
+      <section className="bg-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                なぜ選ばれるのか
+              </h2>
+              <div className="space-y-6">
+                <div className="flex items-start space-x-4">
+                  <Shield className="h-6 w-6 text-blue-600 mt-1" />
+                  <div>
+                    <h3 className="font-semibold mb-1">セキュアな環境</h3>
+                    <p className="text-gray-600">
+                      銀行レベルのセキュリティで大切な投資データを保護
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-4">
+                  <Smartphone className="h-6 w-6 text-blue-600 mt-1" />
+                  <div>
+                    <h3 className="font-semibold mb-1">モバイル対応</h3>
+                    <p className="text-gray-600">
+                      スマートフォンからいつでもどこでもアクセス可能
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-4">
+                  <Globe className="h-6 w-6 text-blue-600 mt-1" />
+                  <div>
+                    <h3 className="font-semibold mb-1">自動データ取得</h3>
+                    <p className="text-gray-600">
+                      SBI証券と連携して保有株式データを自動取得
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-8">
+              <div className="text-center">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                  今すぐ始めよう
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Googleアカウントで簡単ログイン
+                  <br />
+                  数分で配当金管理を開始できます
+                </p>
+                <Button
+                  onClick={() => signIn("google")}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  無料でアカウント作成
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* フッター */}
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h3 className="text-xl font-bold mb-4">配当金管理アプリ</h3>
+            <p className="text-gray-400">
+              © 2024 配当金管理アプリ. All rights reserved.
+            </p>
+          </div>
+        </div>
       </footer>
     </div>
   );
