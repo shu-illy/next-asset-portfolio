@@ -103,11 +103,15 @@ model Stock {
 
 // 保有株
 model Holding {
-  id           String  @id @default(cuid())
-  userId       String
-  stockId      String
-  quantity     Int               // 保有数量
-  averagePrice Decimal @db.Decimal(10, 2) // 平均取得価格
+  id                String  @id @default(cuid())
+  userId            String
+  stockId           String
+  quantity          Int               // 保有数量
+  averagePrice      Decimal @db.Decimal(10, 2) // 平均取得価格
+  currentPrice      Decimal? @db.Decimal(10, 2) // 現在価格
+  marketValue       Decimal? @db.Decimal(12, 2) // 時価総額 (quantity * currentPrice)
+  gainLoss          Decimal? @db.Decimal(12, 2) // 損益金額
+  gainLossPercent   Decimal? @db.Decimal(8, 4) // 損益率 (%)
   
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   stock Stock @relation(fields: [stockId], references: [id], onDelete: Cascade)
