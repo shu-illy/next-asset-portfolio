@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
-import { SettingsClient } from "./settings-client";
+import SettingsClient from "./SettingsClient";
 
 export const metadata: Metadata = {
   title: "設定 | 配当金管理アプリ",

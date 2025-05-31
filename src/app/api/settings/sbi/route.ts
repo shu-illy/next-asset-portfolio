@@ -58,12 +58,22 @@ export async function GET() {
       return NextResponse.json(null);
     }
 
+    console.log("🔍 SBI設定取得デバッグ:", {
+      hasTotpSecretInDB: !!sbiSettings.totpSecret,
+      totpSecretRaw: sbiSettings.totpSecret ? "***暗号化済み***" : null,
+      totpSecretLength: sbiSettings.totpSecret
+        ? sbiSettings.totpSecret.length
+        : 0,
+    });
+
     // パスワードは返さない（存在するかどうかのフラグのみ）
     return NextResponse.json({
       id: sbiSettings.id,
       userId: sbiSettings.userId,
       username: sbiSettings.username,
       hasPassword: !!sbiSettings.password,
+      hasTotpSecret: !!sbiSettings.totpSecret,
+      totpSecret: sbiSettings.totpSecret ? decrypt(sbiSettings.totpSecret) : "",
       createdAt: sbiSettings.createdAt,
       updatedAt: sbiSettings.updatedAt,
     });
@@ -96,8 +106,9 @@ export async function POST(request: NextRequest) {
     const body = (await request.json()) as {
       username: string;
       password: string;
+      totpSecret?: string;
     };
-    const { username, password } = body;
+    const { username, password, totpSecret } = body;
 
     if (!username) {
       return NextResponse.json(
@@ -110,16 +121,34 @@ export async function POST(request: NextRequest) {
       where: { userId: user.id },
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let sbiSettings: any;
+    interface SbiSettings {
+      id: string;
+      userId: string;
+      username: string;
+      password: string;
+      totpSecret?: string | null;
+      createdAt: Date;
+      updatedAt: Date;
+    }
+
+    let sbiSettings: SbiSettings;
 
     if (existingSbiSettings) {
       // 更新
-      const updateData: { username: string; password?: string } = { username };
+      const updateData: {
+        username: string;
+        password?: string;
+        totpSecret?: string | null;
+      } = { username };
 
       // パスワードが入力されている場合のみ更新
       if (password) {
         updateData.password = encrypt(password);
+      }
+
+      // TOTPシークレットが入力されている場合のみ更新
+      if (totpSecret !== undefined) {
+        updateData.totpSecret = totpSecret ? encrypt(totpSecret) : null;
       }
 
       sbiSettings = await prisma.sbiSettings.update({
@@ -140,17 +169,19 @@ export async function POST(request: NextRequest) {
           userId: user.id,
           username,
           password: encrypt(password),
+          totpSecret: totpSecret ? encrypt(totpSecret) : null,
         },
       });
     }
 
-    // パスワードは返さない
+    // パスワードとTOTPシークレットは返さない
     return NextResponse.json(
       {
         id: sbiSettings.id,
         userId: sbiSettings.userId,
         username: sbiSettings.username,
         hasPassword: !!sbiSettings.password,
+        hasTotpSecret: !!sbiSettings.totpSecret,
         createdAt: sbiSettings.createdAt,
         updatedAt: sbiSettings.updatedAt,
       },

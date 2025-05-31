@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
-import { HoldingsClient } from "./holdings-client";
+import { HoldingsClient } from "./HoldingsClient";
 
 export const metadata: Metadata = {
   title: "保有株式 | 配当金管理アプリ",
