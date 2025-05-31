@@ -13,3 +13,152 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// NextAuth.jsで必要なテーブル
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  
+  // 配当金管理アプリ用のフィールド
+  holdings      Holding[]
+  transactions  Transaction[]
+  sbiSettings   SbiSettings?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// SBI証券設定
+model SbiSettings {
+  id       String @id @default(cuid())
+  userId   String @unique
+  username String
+  password String // 暗号化して保存
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 銘柄マスタ
+model Stock {
+  id       String  @id @default(cuid())
+  code     String  @unique // 証券コード (例: "7203")
+  name     String            // 銘柄名 (例: "トヨタ自動車")
+  market   String            // 市場 (例: "東証プライム")
+  sector   String?           // セクター (例: "輸送用機器")
+  
+  holdings    Holding[]
+  dividends   Dividend[]
+  transactions Transaction[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([code])
+  @@index([market])
+  @@index([sector])
+}
+
+// 保有株
+model Holding {
+  id           String  @id @default(cuid())
+  userId       String
+  stockId      String
+  quantity     Int               // 保有数量
+  averagePrice Decimal @db.Decimal(10, 2) // 平均取得価格
+  
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stock Stock @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([userId, stockId])
+  @@index([userId])
+}
+
+// 配当履歴
+model Dividend {
+  id                String   @id @default(cuid())
+  stockId           String
+  dividendDate      DateTime          // 配当支払日
+  dividendPerShare  Decimal  @db.Decimal(8, 2) // 1株あたり配当金
+  exDividendDate    DateTime?         // 権利落ち日
+  
+  stock Stock @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([stockId])
+  @@index([dividendDate])
+}
+
+// 取引履歴
+model Transaction {
+  id       String      @id @default(cuid())
+  userId   String
+  stockId  String
+  type     TransactionType // 買い・売り
+  quantity Int                     // 数量
+  price    Decimal     @db.Decimal(10, 2) // 単価
+  amount   Decimal     @db.Decimal(12, 2) // 総額
+  date     DateTime                // 取引日
+  
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stock Stock @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([stockId])
+  @@index([date])
+}
+
+enum TransactionType {
+  BUY  // 買い
+  SELL // 売り
+}
