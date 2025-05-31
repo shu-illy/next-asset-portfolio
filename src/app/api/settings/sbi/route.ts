@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
-import { createCipher, createDecipher, randomBytes } from "node:crypto";
+import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
 
 // パスワード暗号化のためのキー（実際の運用では環境変数から取得）
 const ENCRYPTION_KEY =
@@ -11,7 +11,8 @@ const ALGORITHM = "aes-256-cbc";
 
 function encrypt(text: string): string {
   const iv = randomBytes(16);
-  const cipher = createCipher(ALGORITHM, ENCRYPTION_KEY);
+  const key = Buffer.from(ENCRYPTION_KEY.slice(0, 32), "utf8");
+  const cipher = createCipheriv(ALGORITHM, key, iv);
   let encrypted = cipher.update(text, "utf8", "hex");
   encrypted += cipher.final("hex");
   return `${iv.toString("hex")}:${encrypted}`;
@@ -23,8 +24,10 @@ function decrypt(text: string): string {
   if (!ivHex) {
     throw new Error("Invalid encrypted text format");
   }
+  const iv = Buffer.from(ivHex, "hex");
   const encryptedText = parts.join(":");
-  const decipher = createDecipher(ALGORITHM, ENCRYPTION_KEY);
+  const key = Buffer.from(ENCRYPTION_KEY.slice(0, 32), "utf8");
+  const decipher = createDecipheriv(ALGORITHM, key, iv);
   let decrypted = decipher.update(encryptedText, "hex", "utf8");
   decrypted += decipher.final("utf8");
   return decrypted;
