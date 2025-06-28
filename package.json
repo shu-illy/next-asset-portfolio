@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "biome check .",
+    "lint:fix": "biome check --fix .",
+    "format": "biome format --write .",
     "seed": "npx tsx prisma/seed.ts",
     "type-check": "tsc --noEmit"
   },
@@ -39,6 +41,7 @@
     "zod": "^3.25.42"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.0.6",
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
