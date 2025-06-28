@@ -2,8 +2,14 @@
 
 import { useState, useRef } from "react";
 
+interface ScrapingResults {
+  total: number;
+  successful: number;
+  details: Array<{code: string, success: boolean, error?: string}>;
+}
+
 interface CsvUploadProps {
-  onUploadSuccess?: (count: number) => void;
+  onUploadSuccess?: (count: number, scrapingResults?: ScrapingResults) => void;
   onUploadError?: (error: string) => void;
 }
 
@@ -39,7 +45,7 @@ export default function CsvUpload({
       const data = await response.json();
 
       if (response.ok) {
-        onUploadSuccess?.(data.count);
+        onUploadSuccess?.(data.count, data.scrapingResults);
       } else {
         onUploadError?.(data.error || "アップロードに失敗しました");
       }
