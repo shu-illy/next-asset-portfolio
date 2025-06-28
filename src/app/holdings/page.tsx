@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
-import { Navigation } from "@/components/Navigation";
+import { Navigation } from "@/components/layout/Navigation";
 import { HoldingsClient } from "./HoldingsClient";
 
 export const metadata: Metadata = {

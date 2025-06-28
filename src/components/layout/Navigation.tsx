@@ -13,7 +13,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -30,7 +30,29 @@ export function Navigation() {
   const { data: session } = useSession();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  if (!session) return null;
+  // 未ログイン時のナビゲーション
+  if (!session) {
+    return (
+      <nav className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* ロゴ */}
+            <Link href="/" className="flex items-center space-x-2">
+              <TrendingUp className="h-8 w-8 text-blue-600" />
+              <span className="text-xl font-bold text-gray-900">配当管理</span>
+            </Link>
+
+            {/* ナビゲーションメニュー */}
+            <div className="flex items-center space-x-4">
+              <Button onClick={() => signIn("google")}>ログイン</Button>
+            </div>
+          </div>
+        </div>
+      </nav>
+    );
+  }
+
+  // ログイン済み時のナビゲーション
 
   return (
     <nav className="bg-white shadow-lg border-b">
@@ -79,7 +101,7 @@ export function Navigation() {
             </div>
 
             <Button
-              onClick={() => signOut()}
+              onClick={() => signOut({ callbackUrl: "/" })}
               variant="outline"
               size="sm"
               className="flex items-center space-x-2"
@@ -143,7 +165,7 @@ export function Navigation() {
               </div>
               <div className="mt-3 px-2">
                 <Button
-                  onClick={() => signOut()}
+                  onClick={() => signOut({ callbackUrl: "/" })}
                   variant="outline"
                   className="w-full flex items-center justify-center space-x-2"
                 >

@@ -13,7 +13,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
-import { Navigation } from "@/components/Navigation";
+import { Navigation } from "@/components/layout/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 

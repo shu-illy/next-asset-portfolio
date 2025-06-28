@@ -11,7 +11,7 @@ import {
 import { useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
 import { useEffect } from "react";
-import Navbar from "@/components/layout/Navbar";
+import { Navigation } from "@/components/layout/Navigation";
 import { Button } from "@/components/ui/button";
 
 export default function HomePage() {
@@ -27,7 +27,7 @@ export default function HomePage() {
   if (status === "loading") {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navbar />
+        <Navigation />
         <div className="flex items-center justify-center h-96">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600" />
         </div>
@@ -41,7 +41,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      <Navigation />
 
       {/* ヒーローセクション */}
       <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
