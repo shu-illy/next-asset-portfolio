@@ -1,6 +1,13 @@
 "use client";
 
-import { BarChart3, Globe, Shield, Smartphone, TrendingUp, Wallet } from "lucide-react";
+import {
+  BarChart3,
+  Globe,
+  Shield,
+  Smartphone,
+  TrendingUp,
+  Wallet,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
 import { useEffect } from "react";
@@ -65,8 +72,12 @@ export default function HomePage() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">主な機能</h2>
-            <p className="text-xl text-gray-600">投資家のための包括的な配当金管理ツール</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              主な機能
+            </h2>
+            <p className="text-xl text-gray-600">
+              投資家のための包括的な配当金管理ツール
+            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -85,7 +96,9 @@ export default function HomePage() {
                 <TrendingUp className="h-8 w-8 text-green-600" />
               </div>
               <h3 className="text-xl font-semibold mb-2">配当予測</h3>
-              <p className="text-gray-600">過去のデータを基に将来の 配当収入を予測・計画</p>
+              <p className="text-gray-600">
+                過去のデータを基に将来の 配当収入を予測・計画
+              </p>
             </div>
 
             <div className="text-center p-6">
@@ -93,7 +106,9 @@ export default function HomePage() {
                 <Wallet className="h-8 w-8 text-purple-600" />
               </div>
               <h3 className="text-xl font-semibold mb-2">ポートフォリオ管理</h3>
-              <p className="text-gray-600">保有株式の一元管理と セクター分散の最適化</p>
+              <p className="text-gray-600">
+                保有株式の一元管理と セクター分散の最適化
+              </p>
             </div>
           </div>
         </div>
@@ -121,7 +136,9 @@ export default function HomePage() {
                   <Smartphone className="h-6 w-6 text-blue-600 mt-1" />
                   <div>
                     <h3 className="font-semibold mb-1">モバイル対応</h3>
-                    <p className="text-gray-600">スマートフォンからいつでもどこでもアクセス可能</p>
+                    <p className="text-gray-600">
+                      スマートフォンからいつでもどこでもアクセス可能
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-4">
@@ -137,13 +154,18 @@ export default function HomePage() {
             </div>
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-8">
               <div className="text-center">
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">今すぐ始めよう</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                  今すぐ始めよう
+                </h3>
                 <p className="text-gray-600 mb-6">
                   Googleアカウントで簡単ログイン
                   <br />
                   数分で配当金管理を開始できます
                 </p>
-                <Button onClick={() => signIn("google")} className="bg-blue-600 hover:bg-blue-700">
+                <Button
+                  onClick={() => signIn("google")}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
                   無料でアカウント作成
                 </Button>
               </div>
@@ -157,7 +179,9 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h3 className="text-xl font-bold mb-4">配当金管理アプリ</h3>
-            <p className="text-gray-400">© 2024 配当金管理アプリ. All rights reserved.</p>
+            <p className="text-gray-400">
+              © 2024 配当金管理アプリ. All rights reserved.
+            </p>
           </div>
         </div>
       </footer>
