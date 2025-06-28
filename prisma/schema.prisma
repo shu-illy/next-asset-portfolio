@@ -44,7 +44,6 @@ model User {
   updatedAt     DateTime      @updatedAt
   accounts      Account[]
   holdings      Holding[]
-  sbiSettings   SbiSettings?
   sessions      Session[]
   transactions  Transaction[]
 }
@@ -57,16 +56,6 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model SbiSettings {
-  id         String   @id @default(cuid())
-  userId     String   @unique
-  username   String
-  password   String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  totpSecret String?
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
 
 model Stock {
   id           String        @id @default(cuid())

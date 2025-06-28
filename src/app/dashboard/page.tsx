@@ -3,14 +3,18 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import Navbar from "@/components/layout/Navbar";
+import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import {
   TrendingUp,
   DollarSign,
   Wallet,
   BarChart3,
   PieChart,
+  Settings,
+  Upload,
 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -26,7 +30,7 @@ export default function DashboardPage() {
   if (status === "loading") {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navbar />
+        <Navigation />
         <div className="flex items-center justify-center h-96">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600" />
         </div>
@@ -63,14 +67,30 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      <Navigation />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">ダッシュボード</h1>
-          <p className="text-gray-600 mt-2">
-            ようこそ、{session.user?.name}さん
-          </p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">ダッシュボード</h1>
+            <p className="text-gray-600 mt-2">
+              ようこそ、{session.user?.name}さん
+            </p>
+          </div>
+          <div className="flex space-x-3">
+            <Link href="/settings">
+              <Button variant="outline" className="flex items-center space-x-2">
+                <Upload className="h-4 w-4" />
+                <span>データ取り込み</span>
+              </Button>
+            </Link>
+            <Link href="/settings">
+              <Button variant="outline" className="flex items-center space-x-2">
+                <Settings className="h-4 w-4" />
+                <span>設定</span>
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* サマリーカード */}
@@ -225,13 +245,15 @@ export default function DashboardPage() {
                     受け取った配当金を追加
                   </p>
                 </button>
-                <button
-                  type="button"
-                  className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 text-left"
-                >
-                  <h3 className="font-medium mb-2">データを同期</h3>
-                  <p className="text-sm text-gray-600">SBI証券からデータ取得</p>
-                </button>
+                <Link href="/settings">
+                  <button
+                    type="button"
+                    className="w-full p-4 border border-gray-200 rounded-lg hover:bg-gray-50 text-left"
+                  >
+                    <h3 className="font-medium mb-2">CSVデータ取り込み</h3>
+                    <p className="text-sm text-gray-600">SBI証券のCSVファイルをアップロード</p>
+                  </button>
+                </Link>
               </div>
             </CardContent>
           </Card>

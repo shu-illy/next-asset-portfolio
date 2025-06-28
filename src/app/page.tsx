@@ -145,9 +145,9 @@ export default function HomePage() {
                 <div className="flex items-start space-x-4">
                   <Globe className="h-6 w-6 text-blue-600 mt-1" />
                   <div>
-                    <h3 className="font-semibold mb-1">自動データ取得</h3>
+                    <h3 className="font-semibold mb-1">簡単データ取り込み</h3>
                     <p className="text-gray-600">
-                      SBI証券と連携して保有株式データを自動取得
+                      SBI証券のCSVファイルを簡単アップロードで保有株式データを取り込み
                     </p>
                   </div>
                 </div>
