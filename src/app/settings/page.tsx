@@ -20,9 +20,7 @@ export default async function SettingsPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">設定</h1>
-          <p className="text-gray-600">
-            SBI証券連携やアプリケーションの設定を管理
-          </p>
+          <p className="text-gray-600">SBI証券連携やアプリケーションの設定を管理</p>
         </div>
 
         <SettingsClient />

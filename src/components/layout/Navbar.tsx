@@ -1,8 +1,8 @@
 "use client";
 
+import { TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { signIn, useSession } from "next-auth/react";
-import { TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Navbar() {
@@ -22,14 +22,10 @@ export default function Navbar() {
           <div className="flex items-center space-x-4">
             {session ? (
               <Link href="/dashboard">
-                <Button variant="outline">
-                  ダッシュボードへ
-                </Button>
+                <Button variant="outline">ダッシュボードへ</Button>
               </Link>
             ) : (
-              <Button onClick={() => signIn("google")}>
-                ログイン
-              </Button>
+              <Button onClick={() => signIn("google")}>ログイン</Button>
             )}
           </div>
         </div>

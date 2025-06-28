@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
@@ -47,7 +47,6 @@ function parseStockData(lines: string[], startIndex: number): ParsedHolding[] {
       const quantity = parseInt(cleanNumericValue(columns[2])) || 0;
       const averagePrice = cleanNumericValue(columns[4]);
       const currentPrice = cleanNumericValue(columns[5]);
-      const acquisitionValue = cleanNumericValue(columns[6]);
       const marketValue = cleanNumericValue(columns[7]);
       const gainLoss = cleanNumericValue(columns[8]);
 
@@ -100,7 +99,6 @@ function parseFundData(
       const quantity = parseInt(cleanNumericValue(quantityStr)) || 0;
       const averagePrice = cleanNumericValue(columns[3]);
       const currentPrice = cleanNumericValue(columns[4]);
-      const acquisitionValue = cleanNumericValue(columns[5]);
       const marketValue = cleanNumericValue(columns[6]);
       const gainLoss = cleanNumericValue(columns[7]);
 
@@ -136,7 +134,9 @@ function parseSbiCsv(csvContent: string): ParsedHolding[] {
     } else if (line.includes("株式（NISA預り（成長投資枠）")) {
       const stockStartIndex = i + 3;
       const nisaStocks = parseStockData(lines, stockStartIndex);
-      nisaStocks.forEach((stock) => (stock.account = "nisa"));
+      nisaStocks.forEach((stock) => {
+        stock.account = "nisa";
+      });
       holdings.push(...nisaStocks);
     } else if (line.includes("投資信託（特定/一般預り）")) {
       const fundStartIndex = i + 3;
@@ -224,7 +224,9 @@ export async function POST(request: NextRequest) {
         });
 
         if (!stock) {
-          let stockInfo;
+          let stockInfo:
+            | { name: string; code: string; market?: string; sector?: string }
+            | undefined;
           let scrapingSuccess = false;
           let scrapingError: string | undefined;
 
@@ -234,7 +236,10 @@ export async function POST(request: NextRequest) {
               console.log(
                 `📡 銘柄情報をスクレイピング中: ${holding.code} - ${holding.name}`
               );
-              stockInfo = await scrapeStockInfoStrict(holding.code);
+              stockInfo = (await scrapeStockInfoStrict(holding.code)) as {
+                name: string;
+                code: string;
+              };
               scrapingSuccess = true;
               console.log(
                 `✅ スクレイピング成功: ${stockInfo.name} (${stockInfo.code})`
@@ -274,20 +279,24 @@ export async function POST(request: NextRequest) {
             });
           }
 
-          stock = await prisma.stock.create({
-            data: {
-              code: stockInfo.code,
-              name: stockInfo.name,
-              market: stockInfo.market,
-              sector:
-                stockInfo.sector ||
-                (holding.type === "fund" ? "投資信託" : "株式"),
-            },
-          });
+          if (stockInfo) {
+            stock = await prisma.stock.create({
+              data: {
+                code: stockInfo.code,
+                name: stockInfo.name,
+                market: stockInfo.market || "未定義",
+                sector:
+                  stockInfo.sector ||
+                  (holding.type === "fund" ? "投資信託" : "株式"),
+              },
+            });
 
-          console.log(
-            `💾 新規株式情報を保存: ${stockInfo.name} (${stockInfo.code})`
-          );
+            console.log(
+              `💾 新規株式情報を保存: ${stockInfo.name} (${stockInfo.code})`
+            );
+          } else {
+            throw new Error(`銘柄情報の取得に失敗しました: ${holding.code}`);
+          }
         }
 
         const existingHolding = await prisma.holding.findFirst({

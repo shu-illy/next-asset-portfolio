@@ -1,16 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Edit, Plus, Trash2, TrendingUp } from "lucide-react";
 import { useSession } from "next-auth/react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit, Trash2, TrendingUp } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Stock {
   id: string;
@@ -32,7 +26,7 @@ interface Holding {
 export function HoldingsClient() {
   const { data: session } = useSession();
   const [holdings, setHoldings] = useState<Holding[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -43,13 +37,7 @@ export function HoldingsClient() {
     averagePrice: "",
   });
 
-  useEffect(() => {
-    if (session?.user) {
-      fetchHoldings();
-    }
-  }, [session]);
-
-  const fetchHoldings = async () => {
+  const fetchHoldings = useCallback(async () => {
     try {
       const response = await fetch("/api/holdings");
       if (response.ok) {
@@ -59,9 +47,15 @@ export function HoldingsClient() {
     } catch (error) {
       console.error("Failed to fetch holdings:", error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (session?.user) {
+      fetchHoldings();
+    }
+  }, [session, fetchHoldings]);
 
   const handleAddStock = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,14 +92,14 @@ export function HoldingsClient() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="space-y-4">
         <div className="animate-pulse">
           <div className="h-8 bg-gray-200 rounded w-1/4 mb-4" />
           <div className="space-y-3">
             {[...Array(3)].map((_, i) => (
-              <div key={`skeleton-${i}`} className="h-24 bg-gray-200 rounded" />
+              <div key={`skeleton-${Date.now()}-${i}`} className="h-24 bg-gray-200 rounded" />
             ))}
           </div>
         </div>
@@ -118,23 +112,15 @@ export function HoldingsClient() {
       {/* ヘッダー */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">
-            保有銘柄 ({holdings.length}銘柄)
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-900">保有銘柄 ({holdings.length}銘柄)</h2>
           <p className="text-sm text-gray-600">
             総評価額: ¥
             {holdings
-              .reduce(
-                (sum, holding) => sum + holding.quantity * holding.averagePrice,
-                0
-              )
+              .reduce((sum, holding) => sum + holding.quantity * holding.averagePrice, 0)
               .toLocaleString()}
           </p>
         </div>
-        <Button
-          onClick={() => setShowAddForm(true)}
-          className="flex items-center gap-2"
-        >
+        <Button onClick={() => setShowAddForm(true)} className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
           株式を追加
         </Button>
@@ -145,9 +131,7 @@ export function HoldingsClient() {
         <Card>
           <CardContent className="text-center py-12">
             <TrendingUp className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              保有株式がありません
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">保有株式がありません</h3>
             <p className="text-gray-600 mb-4">
               最初の株式を追加して、ポートフォリオの管理を始めましょう
             </p>
@@ -160,16 +144,11 @@ export function HoldingsClient() {
       ) : (
         <div className="grid gap-4">
           {holdings.map((holding) => (
-            <Card
-              key={holding.id}
-              className="hover:shadow-md transition-shadow"
-            >
+            <Card key={holding.id} className="hover:shadow-md transition-shadow">
               <CardHeader className="pb-3">
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle className="text-lg">
-                      {holding.stock.name}
-                    </CardTitle>
+                    <CardTitle className="text-lg">{holding.stock.name}</CardTitle>
                     <CardDescription className="flex items-center gap-2 mt-1">
                       <span className="font-mono">{holding.stock.code}</span>
                       <span>•</span>
@@ -196,23 +175,16 @@ export function HoldingsClient() {
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div>
                     <p className="text-gray-600">保有数量</p>
-                    <p className="font-semibold">
-                      {holding.quantity.toLocaleString()}株
-                    </p>
+                    <p className="font-semibold">{holding.quantity.toLocaleString()}株</p>
                   </div>
                   <div>
                     <p className="text-gray-600">平均取得価格</p>
-                    <p className="font-semibold">
-                      ¥{holding.averagePrice.toLocaleString()}
-                    </p>
+                    <p className="font-semibold">¥{holding.averagePrice.toLocaleString()}</p>
                   </div>
                   <div>
                     <p className="text-gray-600">評価額</p>
                     <p className="font-semibold">
-                      ¥
-                      {(
-                        holding.quantity * holding.averagePrice
-                      ).toLocaleString()}
+                      ¥{(holding.quantity * holding.averagePrice).toLocaleString()}
                     </p>
                   </div>
                 </div>
@@ -228,17 +200,12 @@ export function HoldingsClient() {
           <Card className="w-full max-w-md mx-4">
             <CardHeader>
               <CardTitle>新しい株式を追加</CardTitle>
-              <CardDescription>
-                保有している株式の情報を入力してください
-              </CardDescription>
+              <CardDescription>保有している株式の情報を入力してください</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleAddStock} className="space-y-4">
                 <div>
-                  <label
-                    htmlFor="stockCode"
-                    className="block text-sm font-medium mb-1"
-                  >
+                  <label htmlFor="stockCode" className="block text-sm font-medium mb-1">
                     証券コード
                   </label>
                   <input
@@ -253,10 +220,7 @@ export function HoldingsClient() {
                   />
                 </div>
                 <div>
-                  <label
-                    htmlFor="quantity"
-                    className="block text-sm font-medium mb-1"
-                  >
+                  <label htmlFor="quantity" className="block text-sm font-medium mb-1">
                     保有数量
                   </label>
                   <input
@@ -272,10 +236,7 @@ export function HoldingsClient() {
                   />
                 </div>
                 <div>
-                  <label
-                    htmlFor="averagePrice"
-                    className="block text-sm font-medium mb-1"
-                  >
+                  <label htmlFor="averagePrice" className="block text-sm font-medium mb-1">
                     平均取得価格
                   </label>
                   <input
@@ -292,11 +253,7 @@ export function HoldingsClient() {
                   />
                 </div>
                 <div className="flex gap-2 pt-4">
-                  <Button
-                    type="submit"
-                    className="flex-1"
-                    disabled={submitting}
-                  >
+                  <Button type="submit" className="flex-1" disabled={submitting}>
                     {submitting ? "追加中..." : "追加"}
                   </Button>
                   <Button

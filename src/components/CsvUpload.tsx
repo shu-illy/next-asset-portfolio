@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 
 interface ScrapingResults {
   total: number;
   successful: number;
-  details: Array<{code: string, success: boolean, error?: string}>;
+  details: Array<{ code: string; success: boolean; error?: string }>;
 }
 
 interface CsvUploadProps {
@@ -13,10 +13,7 @@ interface CsvUploadProps {
   onUploadError?: (error: string) => void;
 }
 
-export default function CsvUpload({
-  onUploadSuccess,
-  onUploadError,
-}: CsvUploadProps) {
+export default function CsvUpload({ onUploadSuccess, onUploadError }: CsvUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -62,7 +59,7 @@ export default function CsvUpload({
     e.stopPropagation();
     setDragActive(false);
 
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+    if (e.dataTransfer.files?.[0]) {
       handleFileSelect(e.dataTransfer.files[0]);
     }
   };
@@ -80,7 +77,7 @@ export default function CsvUpload({
   };
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
+    if (e.target.files?.[0]) {
       handleFileSelect(e.target.files[0]);
     }
   };
@@ -93,9 +90,7 @@ export default function CsvUpload({
     <div className="space-y-4">
       {/* CSV形式の説明 */}
       <div className="bg-blue-50 p-4 rounded-md">
-        <h3 className="text-sm font-medium text-blue-800 mb-2">
-          CSVファイル形式について
-        </h3>
+        <h3 className="text-sm font-medium text-blue-800 mb-2">CSVファイル形式について</h3>
         <div className="text-sm text-blue-700 space-y-1">
           <p>
             SBI証券の「保有証券一覧」からダウンロードしたCSVファイルをアップロードしてください。
@@ -114,14 +109,20 @@ export default function CsvUpload({
       {/* ファイルアップロード領域 */}
       <div
         className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-          dragActive
-            ? "border-blue-500 bg-blue-50"
-            : "border-gray-300 hover:border-gray-400"
+          dragActive ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-gray-400"
         } ${isUploading ? "pointer-events-none opacity-50" : "cursor-pointer"}`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onClick={handleClick}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            handleClick();
+          }
+        }}
+        role="button"
+        tabIndex={0}
       >
         <input
           ref={fileInputRef}
@@ -140,7 +141,13 @@ export default function CsvUpload({
         ) : (
           <div className="space-y-2">
             <div className="mx-auto h-12 w-12 text-gray-400">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-labelledby="upload-icon-title"
+              >
+                <title id="upload-icon-title">ファイルアップロード</title>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -153,9 +160,7 @@ export default function CsvUpload({
               <p className="text-gray-600">
                 CSVファイルをドラッグ&ドロップするか、クリックして選択
               </p>
-              <p className="text-sm text-gray-500">
-                SBI証券の保有証券一覧CSVファイル（.csv）
-              </p>
+              <p className="text-sm text-gray-500">SBI証券の保有証券一覧CSVファイル（.csv）</p>
             </div>
           </div>
         )}
@@ -163,9 +168,7 @@ export default function CsvUpload({
 
       {/* 使用方法の説明 */}
       <div className="bg-gray-50 p-4 rounded-md">
-        <h3 className="text-sm font-medium text-gray-800 mb-2">
-          CSVファイルの取得方法
-        </h3>
+        <h3 className="text-sm font-medium text-gray-800 mb-2">CSVファイルの取得方法</h3>
         <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
           <li>SBI証券の「ポートフォリオ」ページにアクセス</li>
           <li>「保有証券一覧」の「CSVダウンロード」ボタンをクリック</li>

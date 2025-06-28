@@ -1,21 +1,21 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { Navigation } from "@/components/Navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import {
-  TrendingUp,
-  DollarSign,
-  Wallet,
   BarChart3,
+  DollarSign,
   PieChart,
   Settings,
+  TrendingUp,
   Upload,
+  Wallet,
 } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useEffect } from "react";
+import { Navigation } from "@/components/Navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -73,9 +73,7 @@ export default function DashboardPage() {
         <div className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">ダッシュボード</h1>
-            <p className="text-gray-600 mt-2">
-              ようこそ、{session.user?.name}さん
-            </p>
+            <p className="text-gray-600 mt-2">ようこそ、{session.user?.name}さん</p>
           </div>
           <div className="flex space-x-3">
             <Link href="/settings">
@@ -101,9 +99,7 @@ export default function DashboardPage() {
               <Wallet className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                ¥{portfolioData.totalValue.toLocaleString()}
-              </div>
+              <div className="text-2xl font-bold">¥{portfolioData.totalValue.toLocaleString()}</div>
               <p className="text-xs text-muted-foreground">前日比 +¥25,000</p>
             </CardContent>
           </Card>
@@ -117,26 +113,20 @@ export default function DashboardPage() {
               <div className="text-2xl font-bold text-green-600">
                 +¥{portfolioData.totalGain.toLocaleString()}
               </div>
-              <p className="text-xs text-muted-foreground">
-                +{portfolioData.gainPercentage}%
-              </p>
+              <p className="text-xs text-muted-foreground">+{portfolioData.gainPercentage}%</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                年間配当収入
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">年間配当収入</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
                 ¥{portfolioData.dividendIncome.toLocaleString()}
               </div>
-              <p className="text-xs text-muted-foreground">
-                利回り {portfolioData.dividendYield}%
-              </p>
+              <p className="text-xs text-muted-foreground">利回り {portfolioData.dividendYield}%</p>
             </CardContent>
           </Card>
 
@@ -146,9 +136,7 @@ export default function DashboardPage() {
               <PieChart className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {portfolioData.holdingsCount}銘柄
-              </div>
+              <div className="text-2xl font-bold">{portfolioData.holdingsCount}銘柄</div>
               <p className="text-xs text-muted-foreground">分散投資中</p>
             </CardContent>
           </Card>
@@ -166,10 +154,7 @@ export default function DashboardPage() {
             <CardContent>
               <div className="space-y-4">
                 {recentDividends.map((dividend) => (
-                  <div
-                    key={dividend.id}
-                    className="flex justify-between items-center"
-                  >
+                  <div key={dividend.id} className="flex justify-between items-center">
                     <div>
                       <p className="font-medium">{dividend.stock}</p>
                       <p className="text-sm text-gray-500">{dividend.date}</p>
@@ -199,9 +184,7 @@ export default function DashboardPage() {
                   <div key={holding.id} className="space-y-2">
                     <div className="flex justify-between items-center">
                       <p className="font-medium">{holding.stock}</p>
-                      <p className="text-sm text-gray-500">
-                        {holding.percentage}%
-                      </p>
+                      <p className="text-sm text-gray-500">{holding.percentage}%</p>
                     </div>
                     <div className="flex justify-between items-center">
                       <div className="w-full bg-gray-200 rounded-full h-2 mr-4">
@@ -210,9 +193,7 @@ export default function DashboardPage() {
                           style={{ width: `${holding.percentage}%` }}
                         />
                       </div>
-                      <p className="text-sm font-medium">
-                        ¥{holding.value.toLocaleString()}
-                      </p>
+                      <p className="text-sm font-medium">¥{holding.value.toLocaleString()}</p>
                     </div>
                   </div>
                 ))}
@@ -241,9 +222,7 @@ export default function DashboardPage() {
                   className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 text-left"
                 >
                   <h3 className="font-medium mb-2">配当金を記録</h3>
-                  <p className="text-sm text-gray-600">
-                    受け取った配当金を追加
-                  </p>
+                  <p className="text-sm text-gray-600">受け取った配当金を追加</p>
                 </button>
                 <Link href="/settings">
                   <button

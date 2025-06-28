@@ -33,10 +33,7 @@ export async function GET() {
     return NextResponse.json(holdings);
   } catch (error) {
     console.error("Error fetching holdings:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -88,10 +85,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingHolding) {
-      return NextResponse.json(
-        { error: "この銘柄は既に保有しています" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "この銘柄は既に保有しています" }, { status: 400 });
     }
 
     // 新しい保有を作成
@@ -110,9 +104,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(holding, { status: 201 });
   } catch (error) {
     console.error("Error creating holding:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

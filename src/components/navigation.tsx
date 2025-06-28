@@ -1,18 +1,19 @@
 "use client";
 
+import {
+  BarChart3,
+  DollarSign,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Settings,
+  TrendingUp,
+  X,
+} from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
-import {
-  LayoutDashboard,
-  TrendingUp,
-  DollarSign,
-  BarChart3,
-  Settings,
-  LogOut,
-  Menu,
-  X,
-} from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -66,15 +67,15 @@ export function Navigation() {
           <div className="hidden md:flex items-center space-x-4">
             <div className="flex items-center space-x-3">
               {session.user?.image && (
-                <img
+                <Image
                   src={session.user.image}
                   alt={session.user.name || ""}
                   className="h-8 w-8 rounded-full"
+                  width={32}
+                  height={32}
                 />
               )}
-              <span className="text-sm text-gray-700">
-                {session.user?.name}
-              </span>
+              <span className="text-sm text-gray-700">{session.user?.name}</span>
             </div>
 
             <Button
@@ -95,11 +96,7 @@ export function Navigation() {
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-50"
             >
-              {isMobileMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
+              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
@@ -131,19 +128,17 @@ export function Navigation() {
             <div className="pt-4 pb-3 border-t border-gray-200">
               <div className="flex items-center px-5 space-x-3">
                 {session.user?.image && (
-                  <img
+                  <Image
                     src={session.user.image}
                     alt={session.user.name || ""}
                     className="h-10 w-10 rounded-full"
+                    width={40}
+                    height={40}
                   />
                 )}
                 <div>
-                  <div className="text-base font-medium text-gray-800">
-                    {session.user?.name}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    {session.user?.email}
-                  </div>
+                  <div className="text-base font-medium text-gray-800">{session.user?.name}</div>
+                  <div className="text-sm text-gray-500">{session.user?.email}</div>
                 </div>
               </div>
               <div className="mt-3 px-2">
